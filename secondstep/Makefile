@@ -1,5 +1,5 @@
 # RPATHs for finding dynamic libraries,
-RPATHS?=/home/wink/opt/lib:/home/wink/lib
+RPATH?=$(HOME)/opt/arith
 
 # Get from pybind11 for the -I parameters it needs
 INCLUDES=$(shell python3 -m pybind11 --includes)
@@ -11,8 +11,8 @@ DOT_EXT=$(shell python3-config --extension-suffix)
 help:
 	@echo targets:
 	@echo "run:     build and run example.py,"
-	@echo "           optional param: RPATHS=xxx where xxx is path to libraries"
-	@echo "           default RPATHS=$(RPATHS)"
+	@echo "           optional param: RPATH=xxx where xxx is path to libraries"
+	@echo "           default RPATH=$(RPATH)"
 	@echo "buildit: Build example$(DOT_EXT)"
 	@echo "clean:   Clean artificats"
 
@@ -24,21 +24,22 @@ run: buildit
 .PHONY: buildit
 buildit: example$(DOT_EXT)
 
-example$(DOT_EXT): build/example.obj build/libadd.so
-	g++ -shared -fPIC -o $@ $< -L./build -ladd -Wl,-rpath=$(RPATHS)
+example$(DOT_EXT): build/example.obj $(RPATH)/lib/libarith.so
+	g++ -shared -fPIC -o $@ $< -L$(RPATH)/lib -larith -Wl,-rpath=$(RPATH)/lib
 
 build:
 	mkdir -p build
 
-build/example.obj: example.cxx inc/add.hxx | build
-	g++ -O3 -Wall -std=c++11 -fPIC -I inc $(INCLUDES) -o $@ -c $<
+build/example.obj: example.cxx | build
+	g++ -O3 -Wall -std=c++11 -fPIC -I $(RPATH)/include $(INCLUDES) -o $@ -c $<
 
-build/add.obj: src/add.cxx inc/add.hxx | build
-	g++ -O3 -Wall -std=c++11 -fPIC -I inc -o $@ -c $<
+.PHONY: libarith
+libarith:
+	(cd libarith && cmake -S . -B build && cmake --build build && cmake --install build)
 
-build/libadd.so: build/add.obj
-	g++ -shared -fPIC -o $@ $^
+
+$(RPATH)/lib/libarith.so: libarith
 
 .PHONY: clean
 clean:
-	rm -rf example$(DOT_EXT) build
+	rm -rf example$(DOT_EXT) build libarith/build
