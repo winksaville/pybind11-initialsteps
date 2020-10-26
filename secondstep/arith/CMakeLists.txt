@@ -1,20 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 project(arith VERSION 0.2.0 DESCRIPTION "second step")
 
-#cmake_print_variables(CMAKE_SOURCE_DIR CMAKE_BINARY_DIR CMAKE_CURRENT_SOURCE_DIR)
-
 add_library(arith SHARED src/add.cxx)
 
 set_target_properties(arith PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION 1
-    PUBLIC_HEADER inc/libarith.hxx)
+    PUBLIC_HEADER inc/arith.hxx)
 
-target_include_directories(arith PRIVATE ${CMAKE_SOURCE_DIR}/libarith/inc)
+target_include_directories(arith PRIVATE ${CMAKE_SOURCE_DIR}/arith/inc)
 
 install(TARGETS arith
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-#print_target_properties(arith)
-#cmake_print_properties(TARGETS arith PROPERTIES INCLUDE_DIRECTORIES LINK_LIBRARIES)

@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 
-#include "libarith.hxx"
+#include "arith.hxx"
 
 PYBIND11_MODULE(example, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
